@@ -25,17 +25,16 @@ LANGUAGE_NAMES = {"vi": "Tiếng Việt", "en": "English"}
 UI_TEXT = {
     "vi": {
         "language": "Ngôn ngữ",
-        "light_mode": "Chế độ sáng",
-        "control_plane": "Bảng điều khiển",
-        "run_configuration": "Thiết lập phiên làm việc",
+        "control_plane": "Cấu hình",
+        "run_configuration": "Phiên nghiên cứu",
         "provider": "Nhà cung cấp mô hình",
         "model_override": "Model tùy chọn",
         "model_placeholder": "Để trống để dùng model mặc định",
         "artifact_version": "Phiên bản artifact",
         "history_window": "Số lượt hội thoại cần ghi nhớ",
         "max_tool_rounds": "Số vòng gọi công cụ tối đa",
-        "configuration_note": "Khi đổi cấu hình, yêu cầu tiếp theo sẽ bắt đầu một transcript mới. Thông tin đăng nhập chỉ được đọc từ môi trường trên máy của bạn.",
-        "configured_artifact": "Artifact đang sử dụng",
+        "configuration_note": "Đổi cấu hình sẽ bắt đầu transcript mới. API key chỉ đọc từ môi trường.",
+        "configured_artifact": "Phiên bản agent",
         "transcript": "Transcript",
         "chat_placeholder": "Bạn muốn tìm hiểu chủ đề, tài khoản hoặc đường dẫn nào?",
         "spinner": "Đang tìm hướng xử lý và kiểm tra nguồn…",
@@ -56,9 +55,9 @@ UI_TEXT = {
         "status.max_tool_rounds": "Đã đạt giới hạn xử lý",
         "status.provider_error": "Lỗi nhà cung cấp",
         "status.started": "Đang xử lý",
-        "hero_eyebrow": "Hệ thống nghiên cứu dựa trên bằng chứng",
-        "hero_title": "Mỗi câu trả lời đều có nguồn để kiểm chứng.",
-        "hero_description": "Trợ lý nghiên cứu trực tiếp cho bạn thấy cách chọn công cụ, tham số đã dùng, kết quả nhận được và dấu vân tay artifact — không giấu mọi thứ sau một ô chat.",
+        "hero_eyebrow": "Research Agent",
+        "hero_title": "Tìm nhanh. Kiểm chứng rõ.",
+        "hero_description": "Nghiên cứu web, tin tức, mạng xã hội, bài báo và tài liệu nội bộ trong một nơi.",
         "signal_route": "định tuyến",
         "signal_execute": "thực thi",
         "signal_inspect": "kiểm tra",
@@ -66,17 +65,16 @@ UI_TEXT = {
     },
     "en": {
         "language": "Language",
-        "light_mode": "Light mode",
-        "control_plane": "Control plane",
-        "run_configuration": "Run configuration",
+        "control_plane": "Settings",
+        "run_configuration": "Research session",
         "provider": "Model provider",
         "model_override": "Model override",
         "model_placeholder": "Use the provider default",
         "artifact_version": "Artifact version",
         "history_window": "Conversation turns to remember",
         "max_tool_rounds": "Maximum tool rounds",
-        "configuration_note": "Configuration changes start a new transcript on the next request. Credentials are read only from your local environment.",
-        "configured_artifact": "Configured artifact",
+        "configuration_note": "Changing settings starts a new transcript. API keys stay in the environment.",
+        "configured_artifact": "Agent version",
         "transcript": "Transcript",
         "chat_placeholder": "Ask about a topic, account, or URL…",
         "spinner": "Routing the request and checking sources…",
@@ -97,9 +95,9 @@ UI_TEXT = {
         "status.max_tool_rounds": "Round limit reached",
         "status.provider_error": "Provider error",
         "status.started": "Running",
-        "hero_eyebrow": "Evidence-driven research system",
-        "hero_title": "Trace every answer to its source.",
-        "hero_description": "A live research agent that exposes its routing decisions, tool arguments, execution results, and artifact fingerprint instead of hiding them behind a chat bubble.",
+        "hero_eyebrow": "Research Agent",
+        "hero_title": "Search fast. Verify clearly.",
+        "hero_description": "Research the web, news, social posts, papers, and internal sources in one place.",
         "signal_route": "route",
         "signal_execute": "execute",
         "signal_inspect": "inspect",
@@ -446,97 +444,6 @@ input, textarea, [data-baseweb="select"] > div {
 </style>
 """
 
-LIGHT_STYLES = """
-<style>
-:root {
-    --ink: #f6fbf8;
-    --panel: #ffffff;
-    --panel-soft: #edf7f1;
-    --line: rgba(18, 74, 51, 0.18);
-    --text: #14251e;
-    --muted: #536b60;
-    --acid: #087a48;
-    --amber: #b76700;
-}
-
-.stApp {
-    background:
-        radial-gradient(circle at 13% 8%, rgba(65, 177, 119, 0.13), transparent 27rem),
-        radial-gradient(circle at 90% 32%, rgba(214, 139, 31, 0.09), transparent 24rem),
-        linear-gradient(145deg, #f8fcfa 0%, #eef7f2 48%, #ffffff 100%);
-}
-
-.stApp::before {
-    opacity: 0.45;
-    background-image:
-        linear-gradient(rgba(8, 122, 72, 0.06) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(8, 122, 72, 0.06) 1px, transparent 1px);
-}
-
-[data-testid="stSidebar"] {
-    background: rgba(247, 252, 249, 0.96);
-}
-
-.hero {
-    background:
-        linear-gradient(110deg, rgba(255, 255, 255, 0.98), rgba(237, 247, 241, 0.9)),
-        radial-gradient(circle at 80% 10%, rgba(8, 122, 72, 0.13), transparent 45%);
-    box-shadow: 0 28px 80px rgba(25, 78, 54, 0.12);
-}
-
-.hero::after { color: rgba(8, 122, 72, 0.07); }
-.signal { background: rgba(8, 122, 72, 0.05); }
-.artifact-card { background: rgba(223, 241, 231, 0.82); }
-
-[data-testid="stChatMessage"] {
-    background: rgba(255, 255, 255, 0.88);
-    box-shadow: 0 12px 32px rgba(25, 78, 54, 0.09);
-}
-
-[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
-    border-color: rgba(183, 103, 0, 0.25);
-    background: rgba(255, 246, 229, 0.9);
-}
-
-[data-testid="stExpander"] { background: rgba(247, 252, 249, 0.9); }
-[data-testid="stJson"] { background: rgba(237, 247, 241, 0.9); }
-
-[data-testid="stBottom"] {
-    background: linear-gradient(to top, #f8fcfa 75%, rgba(248, 252, 250, 0)) !important;
-}
-
-[data-testid="stBottomBlockContainer"] {
-    background: transparent !important;
-}
-
-[data-testid="stChatInput"],
-[data-testid="stChatInput"] > div,
-[data-baseweb="textarea"] {
-    color: var(--text) !important;
-    background: #ffffff !important;
-    box-shadow: 0 16px 50px rgba(25, 78, 54, 0.14);
-}
-
-input, textarea, [data-baseweb="select"] > div {
-    color: var(--text) !important;
-    background-color: #ffffff !important;
-}
-
-input::placeholder,
-textarea::placeholder {
-    color: var(--muted) !important;
-    opacity: 0.75 !important;
-}
-
-[data-baseweb="select"] span,
-[data-baseweb="select"] svg {
-    color: var(--text) !important;
-    fill: var(--text) !important;
-}
-</style>
-"""
-
-
 def hero_html(language: str) -> str:
     return f"""
     <section class="hero">
@@ -553,12 +460,11 @@ def hero_html(language: str) -> str:
     """
 
 
-def inject_styles(light_mode: bool = False) -> None:
-    styles = APP_STYLES + (LIGHT_STYLES if light_mode else "")
+def inject_styles() -> None:
     if hasattr(st, "html"):
-        st.html(styles)
+        st.html(APP_STYLES)
     else:
-        st.markdown(styles, unsafe_allow_html=True)
+        st.markdown(APP_STYLES, unsafe_allow_html=True)
 
 
 def redact_secrets(value: Any) -> Any:
@@ -654,7 +560,6 @@ def initialize_state() -> None:
         "transcript_path": None,
         "config_key": None,
         "ui_language": "vi",
-        "light_mode": False,
         "confirm_clear": False,
     }
     for key, value in defaults.items():
@@ -665,7 +570,7 @@ def initialize_state() -> None:
 def main() -> None:
     st.set_page_config(page_title="Research Agent", layout="wide")
     initialize_state()
-    inject_styles(st.session_state.light_mode)
+    inject_styles()
 
     language = st.session_state.ui_language
     with st.sidebar:
@@ -675,7 +580,6 @@ def main() -> None:
             format_func=lambda code: LANGUAGE_NAMES[code],
             key="ui_language",
         )
-        st.toggle(text(language, "light_mode"), key="light_mode")
         st.markdown(
             f"""
             <div class="sidebar-mark">
