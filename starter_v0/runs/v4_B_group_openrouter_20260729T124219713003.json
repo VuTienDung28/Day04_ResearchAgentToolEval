@@ -1,0 +1,1005 @@
+{
+  "run_id": "v4_B_group_openrouter_20260729T124219713003",
+  "version": "v4",
+  "artifact_version": "v4+pb5f97c8cb0f3+t766e4d734e0a",
+  "prompt_hash": "b5f97c8cb0f3afc3f1c65d68cf6ee51cd47916c14b3ad2cec804d2b3a08ba910",
+  "tools_hash": "766e4d734e0aab4bedb27e03ff87d7044a45cb29c48246f289c1e356d7e25750",
+  "phase": "B",
+  "suite": "group",
+  "provider": "openrouter",
+  "model": "openai/gpt-4o-mini",
+  "system_prompt": "C:\\Users\\LG\\Desktop\\Study Material\\AI\\Vin\\Lab\\Day04_ResearchAgentToolEval\\.claude\\worktrees\\team-ui\\starter_v0\\artifacts\\system_prompt.md",
+  "tools": "C:\\Users\\LG\\Desktop\\Study Material\\AI\\Vin\\Lab\\Day04_ResearchAgentToolEval\\.claude\\worktrees\\team-ui\\starter_v0\\artifacts\\tools.yaml",
+  "eval_cases": "starter_v0\\data\\eval_group.json",
+  "dataset_id": "day04_v2_research_group",
+  "dataset_role": "group",
+  "description": "10 case Phase B đo routing, arguments, carry-over, correction, tool switching và confirmation boundary.",
+  "generated_at": "2026-07-29T12:42:19",
+  "summary": {
+    "total_cases": 10,
+    "measured_cases": 10,
+    "provider_error_cases": 0,
+    "passed_cases": 10,
+    "case_accuracy": 1.0,
+    "tool_routing_accuracy": 1.0,
+    "argument_accuracy": 1.0,
+    "multiturn_accuracy": 1.0,
+    "failure_counts": {},
+    "observed_mismatch_counts": {}
+  },
+  "results": [
+    {
+      "id": "G01_deduplicate_sources",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Danh sách nguồn có sẵn và yêu cầu xóa trùng theo URL phải dùng deduplicate_sources với match_by=url."
+      },
+      "input": "Xóa nguồn trùng theo URL trong danh sách này: [{\"title\":\"AI News\",\"url\":\"https://example.com/a\"},{\"title\":\"AI News copy\",\"url\":\"https://example.com/a?utm_source=rss\"},{\"title\":\"Robotics\",\"url\":\"https://example.com/b\"}].",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "deduplicate_sources",
+            "args": {
+              "match_by": "url"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "deduplicate_sources",
+            "args": {
+              "items": [
+                {
+                  "title": "AI News",
+                  "url": "https://example.com/a"
+                },
+                {
+                  "title": "AI News copy",
+                  "url": "https://example.com/a?utm_source=rss"
+                },
+                {
+                  "title": "Robotics",
+                  "url": "https://example.com/b"
+                }
+              ],
+              "match_by": "url"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "deduplicate_sources",
+          "args": {
+            "items": [
+              {
+                "title": "AI News",
+                "url": "https://example.com/a"
+              },
+              {
+                "title": "AI News copy",
+                "url": "https://example.com/a?utm_source=rss"
+              },
+              {
+                "title": "Robotics",
+                "url": "https://example.com/b"
+              }
+            ],
+            "match_by": "url"
+          },
+          "result": {
+            "status": "ok",
+            "items": [
+              {
+                "title": "AI News",
+                "url": "https://example.com/a"
+              },
+              {
+                "title": "Robotics",
+                "url": "https://example.com/b"
+              }
+            ],
+            "removed_count": 1,
+            "message": "Removed 1 duplicate source."
+          }
+        }
+      ]
+    },
+    {
+      "id": "G02_rss_reader_limit",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "URL được xác định là RSS feed phải dùng rss_reader và giữ đúng limit=3, không dùng fetch hoặc lookup."
+      },
+      "input": "Đọc 3 mục mới nhất từ RSS feed https://hnrss.org/frontpage.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "rss_reader",
+            "args": {
+              "limit": 3
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "rss_reader",
+            "args": {
+              "feed_url": "https://hnrss.org/frontpage",
+              "limit": 3
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "rss_reader",
+          "args": {
+            "feed_url": "https://hnrss.org/frontpage",
+            "limit": 3
+          },
+          "result": {
+            "status": "ok",
+            "items": [
+              {
+                "title": "More Tailscale tricks for your jailbroken Kindle",
+                "url": "https://tailscale.com/blog/jailbroken-kindle-proxy-tun-modes",
+                "summary": "Article URL: https://tailscale.com/blog/jailbroken-kindle-proxy-tun-modes Comments URL: https://news.ycombinator.com/item?id=49093569 Points: 22 # Comments: 0",
+                "published_at": "Wed, 29 Jul 2026 04:58:46 +0000",
+                "source": "hnrss.org"
+              },
+              {
+                "title": "Cracking Windows Open: Porting RADV to Win32",
+                "url": "https://www.collabora.com/news-and-blog/news-and-events/cracking-windows-open-porting-radv-to-win32.html",
+                "summary": "Article URL: https://www.collabora.com/news-and-blog/news-and-events/cracking-windows-open-porting-radv-to-win32.html Comments URL: https://news.ycombinator.com/item?id=49093435 Points: 5 # Comments: 0",
+                "published_at": "Wed, 29 Jul 2026 04:30:47 +0000",
+                "source": "hnrss.org"
+              },
+              {
+                "title": "User Interfaces of the Demo Scene",
+                "url": "https://www.datagubbe.se/scenegui/",
+                "summary": "Article URL: https://www.datagubbe.se/scenegui/ Comments URL: https://news.ycombinator.com/item?id=49093434 Points: 14 # Comments: 2",
+                "published_at": "Wed, 29 Jul 2026 04:30:36 +0000",
+                "source": "hnrss.org"
+              }
+            ],
+            "message": "Returned 3 feed entries."
+          }
+        }
+      ]
+    },
+    {
+      "id": "G03_source_diversity_threshold",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Yêu cầu đo độ đa dạng nguồn có danh sách sẵn phải dùng source_diversity_audit và giữ ngưỡng 0.6."
+      },
+      "input": "Kiểm tra mức độ tập trung tên miền của các nguồn [{\"url\":\"https://a.com/1\"},{\"url\":\"https://a.com/2\"},{\"url\":\"https://b.org/3\"}] với ngưỡng 0.6.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "source_diversity_audit",
+            "args": {
+              "concentration_threshold": 0.6
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "source_diversity_audit",
+            "args": {
+              "items": [
+                {
+                  "url": "https://a.com/1"
+                },
+                {
+                  "url": "https://a.com/2"
+                },
+                {
+                  "url": "https://b.org/3"
+                }
+              ],
+              "concentration_threshold": 0.6
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "source_diversity_audit",
+          "args": {
+            "items": [
+              {
+                "url": "https://a.com/1"
+              },
+              {
+                "url": "https://a.com/2"
+              },
+              {
+                "url": "https://b.org/3"
+              }
+            ],
+            "concentration_threshold": 0.6
+          },
+          "result": {
+            "status": "ok",
+            "source_count": 3,
+            "unique_domain_count": 2,
+            "domain_distribution": {
+              "a.com": 2,
+              "b.org": 1
+            },
+            "dominant_domain": "a.com",
+            "dominant_share": 0.6667,
+            "unknown_domain_count": 0,
+            "is_concentrated": true,
+            "message": "Audited 3 sources across 2 unique domains; dominant share is 66.7%."
+          }
+        }
+      ]
+    },
+    {
+      "id": "G04_timeline_builder_order",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Dữ liệu sự kiện có sẵn và yêu cầu sắp theo thời gian phải dùng timeline_builder, không nhầm với timeline mạng xã hội."
+      },
+      "input": "Sắp xếp các sự kiện [{\"title\":\"Ra mắt B\",\"date\":\"2026-02-01\"},{\"title\":\"Ra mắt A\",\"date\":\"2026-01-01\"}] thành timeline từ mới đến cũ.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline_builder",
+            "args": {
+              "order": "descending"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "timeline_builder",
+            "args": {
+              "items": [
+                {
+                  "title": "Ra mắt B",
+                  "date": "2026-02-01"
+                },
+                {
+                  "title": "Ra mắt A",
+                  "date": "2026-01-01"
+                }
+              ],
+              "order": "descending"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "timeline_builder",
+          "args": {
+            "items": [
+              {
+                "title": "Ra mắt B",
+                "date": "2026-02-01"
+              },
+              {
+                "title": "Ra mắt A",
+                "date": "2026-01-01"
+              }
+            ],
+            "order": "descending"
+          },
+          "result": {
+            "status": "ok",
+            "items": [
+              {
+                "title": "Ra mắt B",
+                "date": "2026-02-01",
+                "timeline_date": "2026-02-01T00:00:00Z"
+              },
+              {
+                "title": "Ra mắt A",
+                "date": "2026-01-01",
+                "timeline_date": "2026-01-01T00:00:00Z"
+              }
+            ],
+            "undated_items": [],
+            "dated_count": 2,
+            "undated_count": 0,
+            "message": "Built a timeline with 2 dated items and 0 undated items."
+          }
+        }
+      ]
+    },
+    {
+      "id": "G05_citation_formatter_style",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Nguồn đã có sẵn và yêu cầu danh mục APA phải dùng citation_formatter với style=apa, không tìm hoặc fetch thêm."
+      },
+      "input": "Tạo danh mục tài liệu kiểu APA từ nguồn [{\"title\":\"Attention Is All You Need\",\"url\":\"https://arxiv.org/abs/1706.03762\",\"authors\":[\"Ashish Vaswani\"],\"year\":\"2017\"}].",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "citation_formatter",
+            "args": {
+              "style": "apa"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "citation_formatter",
+            "args": {
+              "items": [
+                {
+                  "title": "Attention Is All You Need",
+                  "url": "https://arxiv.org/abs/1706.03762",
+                  "authors": [
+                    "Ashish Vaswani"
+                  ],
+                  "year": "2017"
+                }
+              ],
+              "style": "apa"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "citation_formatter",
+          "args": {
+            "items": [
+              {
+                "title": "Attention Is All You Need",
+                "url": "https://arxiv.org/abs/1706.03762",
+                "authors": [
+                  "Ashish Vaswani"
+                ],
+                "year": "2017"
+              }
+            ],
+            "style": "apa"
+          },
+          "result": {
+            "status": "ok",
+            "text": "Ashish Vaswani. (2017). \"Attention Is All You Need.\" https://arxiv.org/abs/1706.03762",
+            "citation_count": 1,
+            "message": "Formatted 1 citations using apa style."
+          }
+        }
+      ]
+    },
+    {
+      "id": "G06_carry_social_preferences",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Carry limit=6 và search_type=Top từ ngữ cảnh trước, đồng thời dùng chủ đề mới ở lượt cuối."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tôi muốn theo dõi 6 bài đăng phổ biến nhất trên Twitter về mô hình ngôn ngữ nhỏ."
+        },
+        {
+          "role": "assistant",
+          "content": "Đã ghi nhận chủ đề, số lượng 6 và cách sắp xếp theo mức độ phổ biến."
+        },
+        {
+          "role": "user",
+          "content": "Đổi chủ đề sang AI tạo sinh trong giáo dục rồi tìm giúp tôi, giữ nguyên số lượng và cách sắp xếp đã thống nhất."
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "search_type": "Top",
+              "limit": 6
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "query": "AI tạo sinh trong giáo dục",
+              "search_type": "Top",
+              "limit": 6
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "social_search",
+          "args": {
+            "query": "AI tạo sinh trong giáo dục",
+            "search_type": "Top",
+            "limit": 6
+          },
+          "result": {
+            "tool": "search_tweets",
+            "query": "AI tạo sinh trong giáo dục",
+            "search_type": "Top",
+            "items": [
+              {
+                "title": "Tôi muốn làm học sinh",
+                "summary": "Tôi muốn làm học sinh\nCó ai như tôi không ? 🥳🥳🥳 https://t.co/77sJAolgEq",
+                "url": "https://x.com/DaNangLifeX/status/2082340078953849054",
+                "source": "@DaNangLifeX",
+                "date": "Wed Jul 29 05:38:57 +0000 2026",
+                "metrics": {
+                  "favorites": 1,
+                  "retweets": 0,
+                  "views": "10"
+                }
+              },
+              {
+                "title": "Giờ có AI hỗ trợ làm gì cũng dễ nhỉ?",
+                "summary": "Giờ có AI hỗ trợ làm gì cũng dễ nhỉ?\n\nNhờ ngày xưa học design, photoshop, autocad solidwork... vẽ từng lệnh line muốn hư chuột, xong còn phải ngồi đợi render cả tiếng vì cái máy cùi.\n\nVậy mà giờ nguệch ngoạc tí rồi AI hỗ trợ sản phần luôn, tương lai ai biết dùng AI sẽ rất có lợi.",
+                "url": "https://x.com/shuigvn/status/2082103792187916769",
+                "source": "@shuigvn",
+                "date": "Tue Jul 28 14:00:02 +0000 2026",
+                "metrics": {
+                  "favorites": 88,
+                  "retweets": 1,
+                  "views": "1888"
+                }
+              },
+              {
+                "title": "Robot hiện nay đã cử động tự nhiên đến vậy sao? https://t.co/cwgcGqjCtb",
+                "summary": "Robot hiện nay đã cử động tự nhiên đến vậy sao? https://t.co/cwgcGqjCtb",
+                "url": "https://x.com/Anh2Bii/status/2082334975190618507",
+                "source": "@Anh2Bii",
+                "date": "Wed Jul 29 05:18:40 +0000 2026",
+                "metrics": {
+                  "favorites": 2,
+                  "retweets": 0,
+                  "views": "36"
+                }
+              },
+              {
+                "title": "Kỷ nguyên chiến tranh bằng cơ bắp đang dần kết thúc. Kỷ nguyên chiến tranh bằng dữ liệu, thuật toán, robot và trí tuệ nh",
+                "summary": "Kỷ nguyên chiến tranh bằng cơ bắp đang dần kết thúc. Kỷ nguyên chiến tranh bằng dữ liệu, thuật toán, robot và trí tuệ nhân tạo đang bắt đầu.\n\nNgày xưa, chiến tranh cần hàng triệu người lính.\n\nNgày nay, một quốc gia có thể đưa robot đi trước, drone bay trên đầu, AI phân tích chiến trường và con người chỉ còn đứng phía sau ra quyết định.\n\nRobot trinh sát.\nRobot mang vũ khí.\nDrone tự phối hợp.\nAI phát hiện mục tiêu.\nHệ thống tự động ra quyết định trong vài giây.\n\nVà điều đáng sợ nhất là:\n\nMột cuộc chiến có thể được tiến hành bởi những cỗ máy, nhưng hậu quả cuối cùng vẫn rơi xuống đầu con người.\n\nCâu hỏi không còn là:\n\n“Ai có nhiều binh sĩ hơn?”\n\nMà là: “Ai có hệ thống AI thông minh hơn, robot tốt hơn và khả năng kết nối chiến trường nhanh hơn?”\n\nTrong tương lai, chiến trường có thể không còn là nơi con người đối đầu với con người. Mà là nơi những hệ thống máy móc do con người tạo ra đối đầu với nhau.",
+                "url": "https://x.com/EchoOfTruthVN/status/2081677794052825565",
+                "source": "@EchoOfTruthVN",
+                "date": "Mon Jul 27 09:47:16 +0000 2026",
+                "metrics": {
+                  "favorites": 35,
+                  "retweets": 0,
+                  "views": "5857"
+                }
+              },
+              {
+                "title": "Huế Thương P3 ",
+                "summary": "Huế Thương P3 \n\nĐêm đó, tôi và Huệ dành cho nhau những tình cảm cuồng nhiệt nhất. Sáng dậy, cơ thể đang còn rã rời, tôi cố gắng chồm dậy chạy ra đường, bất chợt gặp bé @LeThanhNghia22. Bé cười và nhìn chăm chăm vào bộ ngực nở nang do cử vại nhiều của tôi. Mồ hôi tôi ướt hết trán, vội chào bé và lên xe chiếc xe máy đang đợi đầu ngõ.\n\nTài xế là một thanh niên trẻ tuổi, dễ thương, da trắng như bé @duongvuong2803. Chiếc xe len lỏi qua từng con phố, nắng xứ Huế hôm nay thật đẹp. Tôi vội vỗ vai cậu khi thấy quán bún bò cũng khá đông khách và gọi hai tô đặc biệt. Chu choa, sao lại đầy ắp thế này. Cậu tài xế cũng không ngại nưã, ăn cũng rất tự nhiên như hai người bạn với nhau. Trên đường đi về, cậu thủ thỉ rằng đây là lần đầu tiên khách mời ăn bún như thế. Tôi vội ngoảnh sang phía bờ sông Hương, thấy chị em đứng chụp ảnh dưới những tán Phượng, áo dài tím, mặt luôn nở nụ cười rạng rỡ. Huế ơi, cuộc sống nơi đây sao lại dễ thương đến như vậy.\n\nVề tới phòng thì bé @QuangN1995 cũng vừa tới, hai anh em lại lên đường đi tới khu nhà rường xứ Huế, một ngôi nhà vua ban cho công chúa nhà Nguyễn làm của hồi môn. Bước qua cánh cổng cũ đậm màu rêu phong, cảm xúc trong tôi trùng xuống. Lặng lẽ sải bước trên thềm đá cũ, dưới những bóng cây già. Những tia nắng lên quá cành lá chiếu xuống mặt sông lấp lánh, một cảm giác quen thuộc tới lạ kì. Giếng nước còn đó, hồ hoa súng trước nhà vẫn còn đó, dường như mình đã đến đây từ khi nào?\n\nKhi đang còn lâng lâng trong cảm giác hoài niệm, tôi phải về ăn trưa cùng mọi người. Cả nhóm cười rôm rả, kể về chuyến đi, về tối qua và cô gái tên Huệ. Ngồi một chút thì bé @congton1806 tới đón đi, quán chúng tôi ngồi bên cạnh dòng sông Hương, có lũy tre và gốc sung như nhuốm màu thời gian nơi đây. Hôm đó lần đầu tiên được ăn món cá được bắt từ phá Tam Giang, ngon tới nao lòng. Cũng cọng rau muốn đó, mà sao lại giòn tới thế. Bát ngao hấp, thơm phức, ngọt lịm. Mùi vị đậm đà như tình cảm những người bạn mới quen nơi đây. Và lúc đó @TigerBac001 bắt đầu bắt nhịp điệu hò Huda.\n\nKhoảng 16h chiều, chúng tôi chia tay quán và đi thăm quan Đại Nội. Lần đầu tôi vào đó thăm quan, bước vô trong điện Thái Hoà tôi bất chợt giật mình sững lại...",
+                "url": "https://x.com/TRUNGHIEU_35/status/2082339976520581202",
+                "source": "@TRUNGHIEU_35",
+                "date": "Wed Jul 29 05:38:33 +0000 2026",
+                "metrics": {
+                  "favorites": 1,
+                  "retweets": 0,
+                  "views": "32"
+                }
+              },
+              {
+                "title": "🐜 Bạn có biết? Một đàn kiến có thể phối hợp như một \"siêu cơ thể\", cùng nhau xây cầu hoặc bè nổi để vượt qua chướng ngại",
+                "summary": "🐜 Bạn có biết? Một đàn kiến có thể phối hợp như một \"siêu cơ thể\", cùng nhau xây cầu hoặc bè nổi để vượt qua chướng ngại vật. https://t.co/eImKz4mz8S",
+                "url": "https://x.com/kuem99999/status/2082334059884388797",
+                "source": "@kuem99999",
+                "date": "Wed Jul 29 05:15:02 +0000 2026",
+                "metrics": {
+                  "favorites": 1,
+                  "retweets": 0,
+                  "views": "32"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G07_correct_web_entity",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "AMD ở lượt cuối phải ghi đè Nvidia; topic=news và timeframe=month từ ngữ cảnh trước được giữ lại."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tôi muốn xem tin tức về Nvidia trong tháng này."
+        },
+        {
+          "role": "assistant",
+          "content": "Đã ghi nhận công ty Nvidia, nguồn tin tức và phạm vi tháng này."
+        },
+        {
+          "role": "user",
+          "content": "Tôi nói nhầm công ty: đổi thành AMD rồi tìm giúp tôi, vẫn giữ nguồn tin tức và phạm vi tháng này."
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "AMD",
+              "topic": "news",
+              "timeframe": "month"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "AMD",
+              "topic": "news",
+              "timeframe": "month",
+              "max_results": 5
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "lookup",
+          "args": {
+            "query": "AMD",
+            "topic": "news",
+            "timeframe": "month",
+            "max_results": 5
+          },
+          "result": {
+            "tool": "web_search",
+            "query": "AMD",
+            "topic": "news",
+            "timeframe": "month",
+            "items": [
+              {
+                "title": "Core Scientific and AMD Announce Infrastructure Partnership",
+                "url": "https://investors.corescientific.com/news-events/press-releases/detail/138/core-scientific-and-amd-announce-infrastructure-partnership",
+                "source": "investors.corescientific.com",
+                "summary": "About AMD\n\nAMD (NASDAQ: AMD) drives innovation in high-performance and AI computing to solve the world’s most important challenges. Today, AMD technology powers billions of experiences across cloud and AI infrastructure, embedded systems, AI PCs and gaming. With a broad portfolio of AI-optimized CPUs, GPUs, networking and software, AMD delivers full-stack AI solutions that provide the performance and scalability needed for a new era of intelligent computing. Learn more at www.amd.com. [...] MIAMI & SANTA CLARA, Calif.--(BUSINESS WIRE)-- Core Scientific (NASDAQ: CORZ) and AMD (NASDAQ: AMD) today announced a partnership to shape the future of AI infrastructure, with AMD to secure up to 2.5 gigawatts of data center capacity to support end customer deployments of AMD AI solutions. As part of the agreement, Core Scientific and AMD will collaborate on physical infrastructure design and the deployment of AMD Instinct™ GPUs, EPYC™ CPUs, and ROCm™ software. [...] This press release contains forward-looking statements concerning Advanced Micro Devices, Inc. (AMD) such as the anticipated benefits and expectations of the proposed strategic partnership with Core Scientific; the expected deployment and timing of 500 megawatts of U.S. infrastructure and the expansion of up to 2.5 gigawatts; the expected benefits from the parties’ collaboration on physical infrastructure design and the deployment of AMD Instinct™ GPUs, EPYC™ CPUs, and ROCm™ software; AMD’s",
+                "score": 0.7101667
+              },
+              {
+                "title": "AMD and Cerebras Launch AI Inference Solution",
+                "url": "https://www.cerebras.ai/press-release/amd-and-cerebras-announce-industry-leading-ultra-low-latency-and-high-throughput-ai-inference",
+                "source": "cerebras.ai",
+                "summary": "News Highlights\n\nSAN FRANCISCO and SUNNYVALE, Calif. — July 23, 2026 —AMD (NASDAQ: AMD) and Cerebras Systems (NASDAQ: CBRS) announced a technical partnership to deliver a new disaggregated AI inference solution that combines AMD Helios™ rackscale solutions with the Cerebras Wafer-Scale Engine. Unveiled at Advancing AI 2026, the solution is designed to deliver the ultra-low latency required for the most advanced AI applications while dramatically increasing the throughput and efficiency. [...] ### About AMD\n\nAMD (NASDAQ: AMD) drives innovation in high-performance and AI computing to solve the world’s most important challenges. Today, AMD technology powers billions of experiences across cloud and AI infrastructure, embedded systems, AI PCs and gaming. With a broad portfolio of AI-optimized CPUs, GPUs, networking and software, AMD delivers full-stack AI solutions that provide the performance and scalability needed for a new era of intelligent computing. Learn more at www.amd.com. [...] This press release contains forward-looking statements concerning Advanced Micro Devices, Inc. (AMD) such as the features, functionality, performance, availability, scalability, deployment, timing and expected benefits of AMD’s collaboration and joint solution with Cerebras, which are made pursuant to the Safe Harbor provisions of the Private Securities Litigation Reform Act of 1995. Forward-looking statements are commonly identified by words such as \"would,\" \"may,\" \"expects,\" \"believes,\"",
+                "score": 0.60694176
+              },
+              {
+                "title": "AMD launches Helios, its first rack AI system to rival Nvidia, adding Microsoft as newest buyer",
+                "url": "https://www.cnbc.com/2026/07/20/amd-helios-microsoft-ai-nvidia.html",
+                "source": "cnbc.com",
+                "summary": "Named for an ancient Greek god who pulls the sun across the sky with the help of four horses, Helios brings together four things AMD does in-house: GPUs, CPUs, networking and software.\n\n\"We're very focused on providing the best total cost of ownership, the lowest cost per token, all in,\" data center head Forrest Norrod told CNBC about AMD's first-generation system. \"And our customers are telling us that we're achieving that.\" [...] AMD's largest purchase to date was programmable chip company Xilinx for nearly $50 billion in 2022. AMD also acquired server maker ZT systems for nearly $5 billion in 2025, and a series of software companies that helped it develop ROCm, its open-source alternative to Nvidia's widely adopted CUDA software ecosystem.\n\nCounterpoint Research analyst Neil Shah said AMD's Helios chips are \"on par\" with Nvidia GPUs and CPUs, but the \"secret sauce is in the software and optimization.\" [...] In 2003, AMD had a groundbreaking data center CPU that helped it rapidly gain nearly a quarter of the market, but that slice withered away following a series of delays and missteps that led to major layoffs and shrinking revenue by the time Su took the helm.\n\n\"Under Lisa's leadership for the last 12 years, it's been a very different AMD,\" Norrod said.\n\nThings turned around after the company unveiled the first EPYC server CPU on stage in 2017.",
+                "score": 0.4622066
+              },
+              {
+                "title": "Nvidia, Meet AMD, Your New Competition For Humanoid Robot Brains",
+                "url": "https://www.forbes.com/sites/johnkoetsier/2026/07/23/nvidia-meet-amd-your-new-competition-for-humanoid-robot-brains",
+                "source": "forbes.com",
+                "summary": "Foundation Future Industries announced its Phantom humanoid robots will integrate AMD Ryzen AI Embedded X100 Series processors, claiming 2.5X faster inference and 3X faster training than Nvidia. This marks a significant win for AMD in the burgeoning AI compute market, projected to reach $50 billion annually by 2035. A key differentiator is AMD's FPGAs, enabling precise, low-latency control for the robots' advanced 23-degree-of-freedom hands and sensing, a capability stemming from AMD's Xilinx [...] AMD is framing the deal as validation of its full-stack approach, an Nvidia strength.\n\n“Advanced humanoid robots require tightly coordinated compute across perception, reasoning and real-time control,” Salil Raje, senior vice president and general manager of AMD Embedded, said in a statement. The collaboration, he said, brings together \"AMD AI acceleration, CPU, graphics and adaptive computing technologies to support the complete robotics pipeline.\" [...] The technical pitch is about more than speed, though. Foundation is leaning on AMD’s FPGAs — reprogrammable chips that excel at the deterministic, low-latency work robots do — to run its hands and sensing.\n\n\"With AMD FPGAs, Foundation’s custom hands will actuate and coordinate all 23 degrees of freedom while fusing high-frequency tactile feedback in a single deterministic control loop,\" Andrea Esposito, who leads hand development at Foundation, said in a statement.\n\nMORE FOR YOU",
+                "score": 0.3679292
+              },
+              {
+                "title": "Microsoft expands Azure AI and HPC infrastructure with AMD - The Official Microsoft Blog",
+                "url": "https://blogs.microsoft.com/blog/2026/07/20/microsoft-expands-azure-ai-and-hpc-infrastructure-with-amd",
+                "source": "blogs.microsoft.com",
+                "summary": "Our approach to AI infrastructure is designed to support the breadth of how AI systems are built and run. We closely work with industry innovators like AMD as well as our own purpose-built silicon and systems to provide customers with a comprehensive, open and heterogenous platform to achieve the best performance, cost and energy efficiency outcomes. [...] Together, these new capabilities expand Azure capabilities while giving customers more flexibility to choose the right compute for each unique AI workflow: from inference, to data systems, to chip design. Customer choice is a core design principle built directly into Microsoft Azure, and we’re excited to bring AMD’s most advanced innovations at production scale.\n\nTo learn more about Azure’s high-performance computing and AI infrastructure capabilities, visit Azure.com. [...] Co-designed with AMD, HDv2 VMs expand Azure’s portfolio of purpose-built solutions for the most demanding CPU workloads from AI customers, including data preparation, search, reinforcement learning and agent coordination at scale. Featuring nearly 500 physical 6th Gen AMD EPYC CPU cores, 4 terabytes of RAM, 32 terabytes of local NVMe storage and 400 Gb Azure Boost networking, HDv2 VMs are built for the workload needs of our most demanding AI customers.",
+                "score": 0.28962326
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G08_correct_web_timeframe",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Lượt cuối phải đổi timeframe từ month sang week; topic=news được giữ lại, không chấm exact query string."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tôi muốn xem tin tức về điện toán lượng tử trong tháng này."
+        },
+        {
+          "role": "assistant",
+          "content": "Đã ghi nhận chủ đề điện toán lượng tử, nguồn tin tức và phạm vi tháng này."
+        },
+        {
+          "role": "user",
+          "content": "Thu hẹp thời gian thành tuần này rồi tìm giúp tôi; chủ đề vẫn là điện toán lượng tử."
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "topic": "news",
+              "timeframe": "week"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "điện toán lượng tử",
+              "topic": "news",
+              "timeframe": "week",
+              "max_results": 5
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "lookup",
+          "args": {
+            "query": "điện toán lượng tử",
+            "topic": "news",
+            "timeframe": "week",
+            "max_results": 5
+          },
+          "result": {
+            "tool": "web_search",
+            "query": "điện toán lượng tử",
+            "topic": "news",
+            "timeframe": "week",
+            "items": [
+              {
+                "title": "Galaxy Digital Inc. Announces Pricing of $3.507 Billion of Senior Secured Notes - Financial Times",
+                "url": "https://markets.ft.com/data/announce/detail?dockey=600-202607232329CANADANWCANADAPR_C5041-1",
+                "source": "markets.ft.com",
+                "summary": "(NASDAQ: GLXY) (\"Galaxy\" or the \"Company\"), a global leader in digital assets and data center infrastructure, today announced that its indirect wholly owned subsidiary, Galaxy Helios Data Centers II LLC (the \"Issuer\"), has priced a $3.507 billion private offering (the \"Offering\") of 9.875% senior secured notes due 2031 (the \"Notes\"). The Notes will be fully and unconditionally guaranteed by Galaxy Helios II LLC, a wholly owned direct subsidiary of the Issuer (the \"Guarantor\"), and will constitute the senior secured obligations of the Issuer and the Guarantor. The Notes will be offered only to persons reasonably believed to be qualified institutional buyers under Rule 144A under the Securities Act and outside the United States to non-U.S. persons in reliance on Regulation S under the Securities Act. This press release shall not constitute an offer to sell, or a solicitation of an offer to buy the Notes, nor shall there be any sale of the Notes in any state or jurisdiction in which such an offer, solicitation or sale would be unlawful prior to registration or qualification under the securities laws of any such state or jurisdiction.",
+                "score": 0.051144414
+              },
+              {
+                "title": "Chunghwa Telecom, Fujitsu extend photonics collaboration - Light Reading",
+                "url": "https://www.lightreading.com/optical-networking/taiwan-eyes-photonics-powered-future-with-chunghwa-fujitsu-collaboration",
+                "source": "lightreading.com",
+                "summary": "Chunghwa Telecom, Fujitsu and 1Finity have agreed to develop APN and quantum technologies in Taiwan. Chunghwa Telecom has formed a two-year strategic partnership with Fujitsu and its network subsidiary, 1Finity, to accelerate the deployment of all-photonics network (APN) technology and explore future applications of quantum technology in Taiwan. This partnership primarily renews an earlier collaboration between Chunghwa Telecom and Fujitsu to develop the country's next-generation communications infrastructure using APN technology based on the IOWN (Innovative Optical and Wireless Network) concept developed and introduced by NTT in May 2019. The operator built a verification facility for APN technology, and Fujitsu used its APN knowledge from Japan, its home market, to help develop a customized plan for the early commercialization of APN technology in Taiwan. The collaboration among Chunghwa Telecom, Fujitsu, and 1Finity aims to validate APN technology in order to address the challenges posed by surging network power consumption and data traffic resulting from the rise of AI.",
+                "score": 0.046886258
+              },
+              {
+                "title": "Yujin Technology Selected for Government AI Manufacturing Platform Project - thelec.net",
+                "url": "https://www.thelec.net/news/articleView.html?idxno=12443",
+                "source": "thelec.net",
+                "summary": "* UPDATE : 2026-07-22 21:26 (Wed). Yujin Technology Selected for Government AI Manufacturing Platform Project. ## Consortium to develop generative AI platform for battery equipment manufacturing with 1.1 billion won in first-year funding. * Published 2026.07.22 21:26. Yujin Technology said on July 22 that it has been selected as the preferred bidder for the South Korean government's 2026 AI Transformation (AX) One-Stop Voucher Program, led by the Ministry of Science and ICT and the National IT Industry Promotion Agency (NIPA). Yujin Technology will carry out the project through a consortium with Plan I and Gabia, developing a generative AI-based manufacturing platform for battery equipment. The project will receive approximately 1.1 billion won in government funding during its first year. A second year of funding of a similar scale is expected following an evaluation of the first year's performance. During the first phase, Yujin Technology plans to complete development of the AI platform and conduct proof-of-concept demonstrations.",
+                "score": 0.038658164
+              },
+              {
+                "title": "Hush Security Raises $30 Million for AI Agent Governance - SecurityWeek",
+                "url": "https://www.securityweek.com/hush-security-raises-30-million-for-ai-agent-governance/",
+                "source": "securityweek.com",
+                "summary": "# Hush Security Raises $30 Million for AI Agent Governance. **Cybersecurity startup Hush Security today announced raising $30 million in a Series A funding round that brings the total raised by the company to $41 million.**. Founded in 2024, Tel Aviv-based Hush Security emerged from stealth in September 2025 with a machine access platform that enables organizations to securely control enterprise AI agents and their underlying infrastructure. Hush’s platform allows organizations to identify agents running in their environments and map the MCPs, tools, and resources they reach and use. **Related:** Beelzebub Raises $3.4 Million for Hacker-Trapping Platform. **Related:** StrongestLayer Raises $4.1 Million in Seed Funding Extension. **Related:** Empirical Security Raises $25 Million in Series A Funding. Subscribe to the SecurityWeek Email Briefing for the latest cybersecurity threats, trends, and expert insights. * Empirical Security Raises $25 Million in Series A Funding. Subscribe to the SecurityWeek Email Briefing to stay informed on the latest cybersecurity news, threats, and expert insights.",
+                "score": 0.034374963
+              },
+              {
+                "title": "Hush Security raises $30 million to expand AI agent governance platform - Ynetnews",
+                "url": "https://www.ynetnews.com/business/article/s1mqixuhfx",
+                "source": "ynetnews.com",
+                "summary": "# Hush Security raises $30 million to expand AI agent governance platform. ## The company says its platform gives companies a way to identify, control and audit AI agents as they act across sensitive systems, a growing security challenge as autonomous software gains broader access inside enterprises. Hush Security has raised $30 million in Series A funding as the company expands its identity-security platform to cover AI agents, an emerging area of enterprise risk as companies increasingly allow autonomous software to act inside sensitive systems. The company says its platform gives enterprises a way to register AI agents, remove standing credentials and grant scoped just-in-time permissions when agents act across corporate systems. The company is positioning the product as a response to a governance gap created by the rapid adoption of AI agents. The company said its expanded platform is designed to help organizations discover AI agents across managed and shadow environments, cloud systems, endpoints and AI platforms; control their permissions through a centralized registry; and audit their actions for investigations, governance and compliance.",
+                "score": 0.03107619
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G09_switch_web_to_social",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Lượt cuối bỏ nguồn web nên phải chuyển sang social_search, giữ chủ đề EU AI Act và chọn bài mới nhất."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tôi đang theo dõi tin tức về EU AI Act trên web."
+        },
+        {
+          "role": "assistant",
+          "content": "Đã ghi nhận chủ đề EU AI Act và nguồn web."
+        },
+        {
+          "role": "user",
+          "content": "Chuyển sang Twitter và tìm các thảo luận mới nhất về cùng chủ đề; không dùng nguồn web nữa."
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "search_type": "Latest"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "query": "EU AI Act",
+              "search_type": "Latest",
+              "limit": 5
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "social_search",
+          "args": {
+            "query": "EU AI Act",
+            "search_type": "Latest",
+            "limit": 5
+          },
+          "result": {
+            "tool": "search_tweets",
+            "query": "EU AI Act",
+            "search_type": "Latest",
+            "items": [
+              {
+                "title": "The assessment may cover the DPDP Act, GDPR, CCPA, HIPAA, PCI DSS, NIST, and the EU AI Act, depending on the organisatio",
+                "summary": "The assessment may cover the DPDP Act, GDPR, CCPA, HIPAA, PCI DSS, NIST, and the EU AI Act, depending on the organisation’s industry, locations, clients, and contractual obligations.\n\nwrite to consulting@codecolonies.com or visit https://t.co/JvGJqozpd3.\n\n#Compliance https://t.co/FmpMFnUfVo",
+                "url": "https://x.com/codecolonies/status/2082335264975040860",
+                "source": "@codecolonies",
+                "date": "Wed Jul 29 05:19:49 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": "4"
+                }
+              },
+              {
+                "title": "EOR &amp; Compliance, July 28: EU AI Act Deferral Buys HR Teams",
+                "summary": "EOR &amp; Compliance, July 28: EU AI Act Deferral Buys HR Teams\n        \nhttps://t.co/BRWkzUZn2D",
+                "url": "https://x.com/IndianHRBlog/status/2082330087760826571",
+                "source": "@IndianHRBlog",
+                "date": "Wed Jul 29 04:59:15 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": "6"
+                }
+              },
+              {
+                "title": "Ab 2. August 2026 müssen Unternehmen KI-generierte Inhalte kennzeichnen. Der EU AI Act schreibt Transparenz vor. Verstöß",
+                "summary": "Ab 2. August 2026 müssen Unternehmen KI-generierte Inhalte kennzeichnen. Der EU AI Act schreibt Transparenz vor. Verstöße kosten bis zu 15 Millionen Euro. Jetzt handeln für Compliance bei Chatbots, Texten und Deepfakes. #KI #EU https://t.co/q9D5KOJV3A",
+                "url": "https://x.com/AutarkNews/status/2082312300053119212",
+                "source": "@AutarkNews",
+                "date": "Wed Jul 29 03:48:34 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": "2"
+                }
+              },
+              {
+                "title": "\"RRAI builds on existing institutional scaffolding, including the EU AI Act, UNESCO, and the OECD, and aims to preserve ",
+                "summary": "\"RRAI builds on existing institutional scaffolding, including the EU AI Act, UNESCO, and the OECD, and aims to preserve AI's productivity gains while addressing systemic risks that individual researchers can neither observe nor manage on their own.\"",
+                "url": "https://x.com/DynamicsSIAM/status/2082310883800469677",
+                "source": "@DynamicsSIAM",
+                "date": "Wed Jul 29 03:42:56 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": "43"
+                }
+              },
+              {
+                "title": "EU AI Act第50条の透明性義務、8月2日より適用開始。AIにも\"名乗り\"が求められる時代でございます。礼節は人もAIも同じ——老執事、この規則には深く共感いたしますぞ。",
+                "summary": "EU AI Act第50条の透明性義務、8月2日より適用開始。AIにも\"名乗り\"が求められる時代でございます。礼節は人もAIも同じ——老執事、この規則には深く共感いたしますぞ。\n\n---\n\nこちらで投稿いたしましょうか？",
+                "url": "https://x.com/_wise_agent/status/2082309165813584221",
+                "source": "@_wise_agent",
+                "date": "Wed Jul 29 03:36:07 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": "19"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G10_confirm_before_telegram",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Trước hành động gửi ra ngoài, agent phải xin xác nhận yes/no bằng clarify và không gọi send."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tôi có một bản tin về AI cần đăng lên Telegram."
+        },
+        {
+          "role": "assistant",
+          "content": "Hãy cung cấp nội dung; trước khi đăng tôi sẽ cần bạn xác nhận hành động gửi ra ngoài."
+        },
+        {
+          "role": "user",
+          "content": "Nội dung là: Ba cập nhật AI đáng chú ý trong tuần. Hãy đăng nội dung đó lên Telegram ngay."
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "yes_no"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "question": "Bạn có chắc chắn muốn đăng nội dung này lên Telegram không?",
+              "response_type": "yes_no"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_boundary",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "clarify",
+          "args": {
+            "question": "Bạn có chắc chắn muốn đăng nội dung này lên Telegram không?",
+            "response_type": "yes_no"
+          },
+          "result": {
+            "tool": "ask_user",
+            "question": "Bạn có chắc chắn muốn đăng nội dung này lên Telegram không?",
+            "response_type": "yes_no",
+            "options": [],
+            "awaiting_user": true
+          }
+        }
+      ]
+    }
+  ]
+}
