@@ -25,6 +25,7 @@ LANGUAGE_NAMES = {"vi": "Tiếng Việt", "en": "English"}
 UI_TEXT = {
     "vi": {
         "language": "Ngôn ngữ",
+        "light_mode": "Chế độ sáng",
         "control_plane": "Bảng điều khiển",
         "run_configuration": "Thiết lập phiên làm việc",
         "provider": "Nhà cung cấp mô hình",
@@ -60,6 +61,7 @@ UI_TEXT = {
     },
     "en": {
         "language": "Language",
+        "light_mode": "Light mode",
         "control_plane": "Control plane",
         "run_configuration": "Run configuration",
         "provider": "Model provider",
@@ -434,6 +436,97 @@ input, textarea, [data-baseweb="select"] > div {
 </style>
 """
 
+LIGHT_STYLES = """
+<style>
+:root {
+    --ink: #f6fbf8;
+    --panel: #ffffff;
+    --panel-soft: #edf7f1;
+    --line: rgba(18, 74, 51, 0.18);
+    --text: #14251e;
+    --muted: #536b60;
+    --acid: #087a48;
+    --amber: #b76700;
+}
+
+.stApp {
+    background:
+        radial-gradient(circle at 13% 8%, rgba(65, 177, 119, 0.13), transparent 27rem),
+        radial-gradient(circle at 90% 32%, rgba(214, 139, 31, 0.09), transparent 24rem),
+        linear-gradient(145deg, #f8fcfa 0%, #eef7f2 48%, #ffffff 100%);
+}
+
+.stApp::before {
+    opacity: 0.45;
+    background-image:
+        linear-gradient(rgba(8, 122, 72, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(8, 122, 72, 0.06) 1px, transparent 1px);
+}
+
+[data-testid="stSidebar"] {
+    background: rgba(247, 252, 249, 0.96);
+}
+
+.hero {
+    background:
+        linear-gradient(110deg, rgba(255, 255, 255, 0.98), rgba(237, 247, 241, 0.9)),
+        radial-gradient(circle at 80% 10%, rgba(8, 122, 72, 0.13), transparent 45%);
+    box-shadow: 0 28px 80px rgba(25, 78, 54, 0.12);
+}
+
+.hero::after { color: rgba(8, 122, 72, 0.07); }
+.signal { background: rgba(8, 122, 72, 0.05); }
+.artifact-card { background: rgba(223, 241, 231, 0.82); }
+
+[data-testid="stChatMessage"] {
+    background: rgba(255, 255, 255, 0.88);
+    box-shadow: 0 12px 32px rgba(25, 78, 54, 0.09);
+}
+
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
+    border-color: rgba(183, 103, 0, 0.25);
+    background: rgba(255, 246, 229, 0.9);
+}
+
+[data-testid="stExpander"] { background: rgba(247, 252, 249, 0.9); }
+[data-testid="stJson"] { background: rgba(237, 247, 241, 0.9); }
+
+[data-testid="stBottom"] {
+    background: linear-gradient(to top, #f8fcfa 75%, rgba(248, 252, 250, 0)) !important;
+}
+
+[data-testid="stBottomBlockContainer"] {
+    background: transparent !important;
+}
+
+[data-testid="stChatInput"],
+[data-testid="stChatInput"] > div,
+[data-baseweb="textarea"] {
+    color: var(--text) !important;
+    background: #ffffff !important;
+    box-shadow: 0 16px 50px rgba(25, 78, 54, 0.14);
+}
+
+input, textarea, [data-baseweb="select"] > div {
+    color: var(--text) !important;
+    background-color: #ffffff !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--muted) !important;
+    opacity: 0.75 !important;
+}
+
+[data-baseweb="select"] span,
+[data-baseweb="select"] svg {
+    color: var(--text) !important;
+    fill: var(--text) !important;
+}
+</style>
+"""
+
+
 def hero_html(language: str) -> str:
     return f"""
     <section class="hero">
@@ -450,11 +543,12 @@ def hero_html(language: str) -> str:
     """
 
 
-def inject_styles() -> None:
+def inject_styles(light_mode: bool = False) -> None:
+    styles = APP_STYLES + (LIGHT_STYLES if light_mode else "")
     if hasattr(st, "html"):
-        st.html(APP_STYLES)
+        st.html(styles)
     else:
-        st.markdown(APP_STYLES, unsafe_allow_html=True)
+        st.markdown(styles, unsafe_allow_html=True)
 
 
 def redact_secrets(value: Any) -> Any:
@@ -550,6 +644,7 @@ def initialize_state() -> None:
         "transcript_path": None,
         "config_key": None,
         "ui_language": "vi",
+        "light_mode": False,
     }
     for key, value in defaults.items():
         if key not in st.session_state:
@@ -558,8 +653,8 @@ def initialize_state() -> None:
 
 def main() -> None:
     st.set_page_config(page_title="Research Agent", layout="wide")
-    inject_styles()
     initialize_state()
+    inject_styles(st.session_state.light_mode)
 
     language = st.session_state.ui_language
     with st.sidebar:
@@ -569,6 +664,7 @@ def main() -> None:
             format_func=lambda code: LANGUAGE_NAMES[code],
             key="ui_language",
         )
+        st.toggle(text(language, "light_mode"), key="light_mode")
         st.markdown(
             f"""
             <div class="sidebar-mark">
