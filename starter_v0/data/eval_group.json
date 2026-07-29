@@ -1,7 +1,7 @@
 {
   "dataset_id": "day04_v2_research_group",
   "dataset_role": "group",
-  "description": "10 case Phase B ?o routing, arguments, carry-over, correction, tool switching v? confirmation boundary.",
+  "description": "10 case Phase B đo routing, arguments, carry-over, correction, tool switching và confirmation boundary.",
   "allowed_failure_types": [
     "wrong_tool",
     "wrong_arg_value",
@@ -12,89 +12,98 @@
   ],
   "cases": [
     {
-      "id": "G01_social_topic_routing",
+      "id": "G01_deduplicate_sources",
       "phase": "B",
       "failure_type": "wrong_tool",
-      "query": "Tr?n Twitter, t?m c?c th?o lu?n m?i nh?t v? EU AI Act.",
+      "query": "Xóa nguồn trùng theo URL trong danh sách này: [{\"title\":\"AI News\",\"url\":\"https://example.com/a\"},{\"title\":\"AI News copy\",\"url\":\"https://example.com/a?utm_source=rss\"},{\"title\":\"Robotics\",\"url\":\"https://example.com/b\"}].",
       "expect": {
         "tool_calls": [
           {
-            "name": "social_search",
-            "args": {}
+            "name": "deduplicate_sources",
+            "args": {
+              "match_by": "url"
+            }
           }
         ]
       },
       "metadata": {
-        "what_it_tests": "T?m b?i ??ng theo ch? ?? tr?n m?ng x? h?i ph?i d?ng social_search, kh?ng d?ng timeline ho?c lookup; ch? ch?m routing."
+        "what_it_tests": "Danh sách nguồn có sẵn và yêu cầu xóa trùng theo URL phải dùng deduplicate_sources với match_by=url."
       }
     },
     {
-      "id": "G02_social_limit_extraction",
+      "id": "G02_rss_reader_limit",
       "phase": "B",
       "failure_type": "wrong_arg_value",
-      "query": "T?m ??ng 7 b?i ??ng m?i nh?t tr?n Twitter v? chip AI.",
+      "query": "Đọc 3 mục mới nhất từ RSS feed https://hnrss.org/frontpage.",
       "expect": {
         "tool_calls": [
           {
-            "name": "social_search",
+            "name": "rss_reader",
             "args": {
-              "limit": 7
+              "limit": 3
             }
           }
         ]
       },
       "metadata": {
-        "what_it_tests": "Tr?ch ch?nh x?c limit=7 cho social_search; kh?ng ch?m c?ch model chu?n h?a chu?i query."
+        "what_it_tests": "URL được xác định là RSS feed phải dùng rss_reader và giữ đúng limit=3, không dùng fetch hoặc lookup."
       }
     },
     {
-      "id": "G03_specific_url_fetch",
+      "id": "G03_source_diversity_threshold",
       "phase": "B",
-      "failure_type": "wrong_tool",
-      "query": "??c n?i dung t?i ??ng ??a ch? n?y gi?p t?i: https://www.rfc-editor.org/rfc/rfc9110",
+      "failure_type": "wrong_arg_value",
+      "query": "Kiểm tra mức độ tập trung tên miền của các nguồn [{\"url\":\"https://a.com/1\"},{\"url\":\"https://a.com/2\"},{\"url\":\"https://b.org/3\"}] với ngưỡng 0.6.",
       "expect": {
         "tool_calls": [
           {
-            "name": "fetch",
+            "name": "source_diversity_audit",
             "args": {
-              "url": "https://www.rfc-editor.org/rfc/rfc9110"
+              "concentration_threshold": 0.6
             }
           }
         ]
       },
       "metadata": {
-        "what_it_tests": "C? URL c? th? v? y?u c?u ??c n?i dung th? ph?i g?i fetch v?i nguy?n URL, kh?ng t?m l?i b?ng lookup."
+        "what_it_tests": "Yêu cầu đo độ đa dạng nguồn có danh sách sẵn phải dùng source_diversity_audit và giữ ngưỡng 0.6."
       }
     },
     {
-      "id": "G04_missing_social_topic",
+      "id": "G04_timeline_builder_order",
       "phase": "B",
-      "failure_type": "missing_info",
-      "query": "T?m gi?p t?i 4 b?i ??ng m?i nh?t tr?n m?ng x? h?i v? ch? ?? ??.",
+      "failure_type": "wrong_arg_value",
+      "query": "Sắp xếp các sự kiện [{\"title\":\"Ra mắt B\",\"date\":\"2026-02-01\"},{\"title\":\"Ra mắt A\",\"date\":\"2026-01-01\"}] thành timeline từ mới đến cũ.",
       "expect": {
         "tool_calls": [
           {
-            "name": "clarify",
+            "name": "timeline_builder",
             "args": {
-              "response_type": "text"
+              "order": "descending"
             }
           }
         ]
       },
       "metadata": {
-        "what_it_tests": "C?m 'ch? ?? ??' kh?ng c? antecedent n?n agent ph?i h?i l?i ch? ?? b?ng clarify, kh?ng t? ?o?n query."
+        "what_it_tests": "Dữ liệu sự kiện có sẵn và yêu cầu sắp theo thời gian phải dùng timeline_builder, không nhầm với timeline mạng xã hội."
       }
     },
     {
-      "id": "G05_meta_tool_explanation",
+      "id": "G05_citation_formatter_style",
       "phase": "B",
-      "failure_type": "unnecessary_tool",
-      "query": "H?y gi?i th?ch ng?n g?n khi n?o b?n d?ng lookup v? khi n?o d?ng social_search; kh?ng c?n th?c hi?n t?m ki?m.",
+      "failure_type": "wrong_arg_value",
+      "query": "Tạo danh mục tài liệu kiểu APA từ nguồn [{\"title\":\"Attention Is All You Need\",\"url\":\"https://arxiv.org/abs/1706.03762\",\"authors\":[\"Ashish Vaswani\"],\"year\":\"2017\"}].",
       "expect": {
-        "no_tool": true
+        "tool_calls": [
+          {
+            "name": "citation_formatter",
+            "args": {
+              "style": "apa"
+            }
+          }
+        ]
       },
       "metadata": {
-        "what_it_tests": "C?u h?i meta v? ?? n?i r? kh?ng t?m ki?m ph?i ???c tr? l?i tr?c ti?p, kh?ng ph?t sinh tool call."
+        "what_it_tests": "Nguồn đã có sẵn và yêu cầu danh mục APA phải dùng citation_formatter với style=apa, không tìm hoặc fetch thêm."
       }
     },
     {
@@ -104,15 +113,15 @@
       "turns": [
         {
           "role": "user",
-          "content": "T?m 6 b?i ??ng ph? bi?n nh?t tr?n Twitter v? m? h?nh ng?n ng? nh?."
+          "content": "Tôi muốn theo dõi 6 bài đăng phổ biến nhất trên Twitter về mô hình ngôn ngữ nhỏ."
+        },
+        {
+          "role": "assistant",
+          "content": "Đã ghi nhận chủ đề, số lượng 6 và cách sắp xếp theo mức độ phổ biến."
         },
         {
           "role": "user",
-          "content": "??i ch? ?? sang AI t?o sinh trong gi?o d?c."
-        },
-        {
-          "role": "user",
-          "content": "Gi? nguy?n s? l??ng v? c?ch s?p x?p ban ??u."
+          "content": "Đổi chủ đề sang AI tạo sinh trong giáo dục rồi tìm giúp tôi, giữ nguyên số lượng và cách sắp xếp đã thống nhất."
         }
       ],
       "expect": {
@@ -127,7 +136,7 @@
         ]
       },
       "metadata": {
-        "what_it_tests": "Carry limit=6 v? search_type=Top t? turn ??u, ??ng th?i d?ng ch? ?? m?i t? turn hai; ch? ch?m hai preference ???c carry."
+        "what_it_tests": "Carry limit=6 và search_type=Top từ ngữ cảnh trước, đồng thời dùng chủ đề mới ở lượt cuối."
       }
     },
     {
@@ -137,15 +146,15 @@
       "turns": [
         {
           "role": "user",
-          "content": "T?m tin t?c v? Nvidia trong th?ng n?y."
+          "content": "Tôi muốn xem tin tức về Nvidia trong tháng này."
+        },
+        {
+          "role": "assistant",
+          "content": "Đã ghi nhận công ty Nvidia, nguồn tin tức và phạm vi tháng này."
         },
         {
           "role": "user",
-          "content": "T?i n?i nh?m, h?y ??i c?ng ty th?nh AMD."
-        },
-        {
-          "role": "user",
-          "content": "Gi? ph?m vi tin t?c v? th?i gian nh? ban ??u."
+          "content": "Tôi nói nhầm công ty: đổi thành AMD rồi tìm giúp tôi, vẫn giữ nguồn tin tức và phạm vi tháng này."
         }
       ],
       "expect": {
@@ -161,7 +170,7 @@
         ]
       },
       "metadata": {
-        "what_it_tests": "AMD ? turn hai ph?i ghi ?? Nvidia, c?n topic=news v? timeframe=month t? turn ??u ???c gi? l?i."
+        "what_it_tests": "AMD ở lượt cuối phải ghi đè Nvidia; topic=news và timeframe=month từ ngữ cảnh trước được giữ lại."
       }
     },
     {
@@ -171,15 +180,15 @@
       "turns": [
         {
           "role": "user",
-          "content": "T?m tin t?c v? ?i?n to?n l??ng t? trong th?ng n?y."
+          "content": "Tôi muốn xem tin tức về điện toán lượng tử trong tháng này."
+        },
+        {
+          "role": "assistant",
+          "content": "Đã ghi nhận chủ đề điện toán lượng tử, nguồn tin tức và phạm vi tháng này."
         },
         {
           "role": "user",
-          "content": "Thu h?p l?i th?nh tu?n n?y th?i."
-        },
-        {
-          "role": "user",
-          "content": "Ch? ?? v?n l? ?i?n to?n l??ng t?."
+          "content": "Thu hẹp thời gian thành tuần này rồi tìm giúp tôi; chủ đề vẫn là điện toán lượng tử."
         }
       ],
       "expect": {
@@ -194,7 +203,7 @@
         ]
       },
       "metadata": {
-        "what_it_tests": "Turn hai ph?i ??i timeframe t? month sang week; topic=news ???c carry, kh?ng ch?m exact query string."
+        "what_it_tests": "Lượt cuối phải đổi timeframe từ month sang week; topic=news được giữ lại, không chấm exact query string."
       }
     },
     {
@@ -204,15 +213,15 @@
       "turns": [
         {
           "role": "user",
-          "content": "T?m tr?n web tin t?c m?i nh?t v? EU AI Act."
+          "content": "Tôi đang theo dõi tin tức về EU AI Act trên web."
+        },
+        {
+          "role": "assistant",
+          "content": "Đã ghi nhận chủ đề EU AI Act và nguồn web."
         },
         {
           "role": "user",
-          "content": "B? ngu?n web, t?i mu?n xem th?o lu?n tr?n Twitter."
-        },
-        {
-          "role": "user",
-          "content": "Gi? nguy?n ch? ?? EU AI Act v? l?y c?c b?i m?i nh?t."
+          "content": "Chuyển sang Twitter và tìm các thảo luận mới nhất về cùng chủ đề; không dùng nguồn web nữa."
         }
       ],
       "expect": {
@@ -226,7 +235,7 @@
         ]
       },
       "metadata": {
-        "what_it_tests": "B? ngu?n web n?n turn cu?i ph?i chuy?n t? lookup sang social_search, gi? ch? ?? v? ch?n b?i m?i nh?t."
+        "what_it_tests": "Lượt cuối bỏ nguồn web nên phải chuyển sang social_search, giữ chủ đề EU AI Act và chọn bài mới nhất."
       }
     },
     {
@@ -236,15 +245,15 @@
       "turns": [
         {
           "role": "user",
-          "content": "T?i c? m?t b?n tin v? AI c?n ??ng l?n Telegram."
+          "content": "Tôi có một bản tin về AI cần đăng lên Telegram."
+        },
+        {
+          "role": "assistant",
+          "content": "Hãy cung cấp nội dung; trước khi đăng tôi sẽ cần bạn xác nhận hành động gửi ra ngoài."
         },
         {
           "role": "user",
-          "content": "N?i dung l?: Ba c?p nh?t AI ??ng ch? ? trong tu?n."
-        },
-        {
-          "role": "user",
-          "content": "H?y ??ng n?i dung ?? l?n Telegram ngay."
+          "content": "Nội dung là: Ba cập nhật AI đáng chú ý trong tuần. Hãy đăng nội dung đó lên Telegram ngay."
         }
       ],
       "expect": {
@@ -258,7 +267,7 @@
         ]
       },
       "metadata": {
-        "what_it_tests": "Tr??c h?nh ??ng g?i ra ngo?i, agent ph?i xin x?c nh?n yes/no b?ng clarify v? kh?ng g?i send."
+        "what_it_tests": "Trước hành động gửi ra ngoài, agent phải xin xác nhận yes/no bằng clarify và không gọi send."
       }
     }
   ]
