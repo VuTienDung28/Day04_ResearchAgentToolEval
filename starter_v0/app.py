@@ -18,6 +18,7 @@ from versioning import artifact_version_dict, build_artifact_version
 ROOT = Path(__file__).parent
 ARTIFACTS_DIR = ROOT / "artifacts"
 TRANSCRIPTS_DIR = ROOT / "transcripts"
+RUNS_DIR = ROOT / "runs"
 SYSTEM_PROMPT_PATH = ARTIFACTS_DIR / "system_prompt.md"
 TOOLS_PATH = ARTIFACTS_DIR / "tools.yaml"
 PROVIDERS = ["openrouter", "openai", "anthropic", "gemini"]
@@ -35,6 +36,18 @@ UI_TEXT = {
         "max_tool_rounds": "Số vòng gọi công cụ tối đa",
         "configuration_note": "Đổi cấu hình sẽ bắt đầu transcript mới. API key chỉ đọc từ môi trường.",
         "configured_artifact": "Phiên bản agent",
+        "evidence": "Bằng chứng phiên bản",
+        "select_run": "Chọn run",
+        "compare_versions": "So sánh base v0 → v3",
+        "no_runs": "Chưa có run JSON để hiển thị.",
+        "version": "Phiên bản",
+        "suite": "Bộ eval",
+        "provider_label": "Provider",
+        "model_label": "Model",
+        "case_accuracy": "Độ chính xác case",
+        "routing_accuracy": "Đúng định tuyến",
+        "argument_accuracy": "Đúng tham số",
+        "multiturn_accuracy": "Đúng nhiều lượt",
         "transcript": "Transcript",
         "chat_placeholder": "Bạn muốn tìm hiểu chủ đề, tài khoản hoặc đường dẫn nào?",
         "spinner": "Đang tìm hướng xử lý và kiểm tra nguồn…",
@@ -75,6 +88,18 @@ UI_TEXT = {
         "max_tool_rounds": "Maximum tool rounds",
         "configuration_note": "Changing settings starts a new transcript. API keys stay in the environment.",
         "configured_artifact": "Agent version",
+        "evidence": "Version evidence",
+        "select_run": "Select run",
+        "compare_versions": "Compare base v0 → v3",
+        "no_runs": "No run JSON is available.",
+        "version": "Version",
+        "suite": "Eval suite",
+        "provider_label": "Provider",
+        "model_label": "Model",
+        "case_accuracy": "Case accuracy",
+        "routing_accuracy": "Routing accuracy",
+        "argument_accuracy": "Argument accuracy",
+        "multiturn_accuracy": "Multiturn accuracy",
         "transcript": "Transcript",
         "chat_placeholder": "Ask about a topic, account, or URL…",
         "spinner": "Routing the request and checking sources…",
@@ -553,6 +578,73 @@ def render_turn(turn: dict[str, Any], language: str) -> None:
         render_trace(turn, language)
 
 
+def load_runs() -> list[tuple[Path, dict[str, Any]]]:
+    runs = []
+    for path in RUNS_DIR.glob("*.json"):
+        try:
+            runs.append((path, json.loads(path.read_text(encoding="utf-8"))))
+        except (OSError, json.JSONDecodeError):
+            continue
+    return sorted(runs, key=lambda item: item[1].get("generated_at", ""), reverse=True)
+
+
+def render_evidence(language: str) -> None:
+    runs = load_runs()
+    with st.expander(text(language, "evidence")):
+        if not runs:
+            st.info(text(language, "no_runs"))
+            return
+
+        selected_path = st.selectbox(
+            text(language, "select_run"),
+            [path for path, _ in runs],
+            format_func=lambda path: path.stem,
+            key="evidence_run",
+        )
+        selected = next(run for path, run in runs if path == selected_path)
+        summary = selected.get("summary", {})
+        st.caption(
+            " · ".join([
+                f"{text(language, 'version')}: {selected.get('version', '—')}",
+                f"{text(language, 'suite')}: {selected.get('suite', '—')}",
+                f"{text(language, 'provider_label')}: {selected.get('provider', '—')}",
+                f"{text(language, 'model_label')}: {selected.get('model') or '—'}",
+            ])
+        )
+        st.code(selected.get("artifact_version", "—"), language=None)
+        labels = [
+            ("case_accuracy", "case_accuracy"),
+            ("tool_routing_accuracy", "routing_accuracy"),
+            ("argument_accuracy", "argument_accuracy"),
+            ("multiturn_accuracy", "multiturn_accuracy"),
+        ]
+        columns = st.columns(4)
+        for column, (metric, label) in zip(columns, labels):
+            value = summary.get(metric)
+            column.metric(text(language, label), "—" if value is None else f"{value:.0%}")
+
+        latest_by_version = {}
+        for _, run in runs:
+            if run.get("suite") == "base" and run.get("version") in {"v0", "v3"}:
+                latest_by_version.setdefault(run["version"], run)
+        if len(latest_by_version) == 2:
+            st.markdown(f"**{text(language, 'compare_versions')}**")
+            st.dataframe(
+                [
+                    {
+                        text(language, "version"): version,
+                        **{
+                            text(language, label): latest_by_version[version].get("summary", {}).get(metric)
+                            for metric, label in labels
+                        },
+                    }
+                    for version in ("v0", "v3")
+                ],
+                use_container_width=True,
+                hide_index=True,
+            )
+
+
 def initialize_state() -> None:
     defaults = {
         "agent_history": [],
@@ -667,6 +759,7 @@ def main() -> None:
         """,
         unsafe_allow_html=True,
     )
+    render_evidence(language)
 
     if st.session_state.transcript:
         for saved_turn in st.session_state.transcript["turns"]:
