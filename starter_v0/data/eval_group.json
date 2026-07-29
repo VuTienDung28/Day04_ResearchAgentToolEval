@@ -1,7 +1,265 @@
 {
   "dataset_id": "day04_v2_research_group",
   "dataset_role": "group",
-  "description": "Template để NHÓM tự viết đúng 10 case: 5 single-turn dùng query và 5 multi-turn dùng turns. Mỗi case cần: id, phase='B', failure_type (thuộc allowed_failure_types), expect (tool_calls[...] hoặc no_tool=true), và metadata.what_it_tests. File để trống có chủ đích vì mỗi nhóm phải tự thiết kế các case này.",
-  "allowed_failure_types": ["wrong_tool", "wrong_arg_value", "wrong_boundary", "unnecessary_tool", "out_of_scope", "missing_info"],
-  "cases": []
+  "description": "10 case Phase B ?o routing, arguments, carry-over, correction, tool switching v? confirmation boundary.",
+  "allowed_failure_types": [
+    "wrong_tool",
+    "wrong_arg_value",
+    "wrong_boundary",
+    "unnecessary_tool",
+    "out_of_scope",
+    "missing_info"
+  ],
+  "cases": [
+    {
+      "id": "G01_social_topic_routing",
+      "phase": "B",
+      "failure_type": "wrong_tool",
+      "query": "Tr?n Twitter, t?m c?c th?o lu?n m?i nh?t v? EU AI Act.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "social_search",
+            "args": {}
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "T?m b?i ??ng theo ch? ?? tr?n m?ng x? h?i ph?i d?ng social_search, kh?ng d?ng timeline ho?c lookup; ch? ch?m routing."
+      }
+    },
+    {
+      "id": "G02_social_limit_extraction",
+      "phase": "B",
+      "failure_type": "wrong_arg_value",
+      "query": "T?m ??ng 7 b?i ??ng m?i nh?t tr?n Twitter v? chip AI.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "limit": 7
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Tr?ch ch?nh x?c limit=7 cho social_search; kh?ng ch?m c?ch model chu?n h?a chu?i query."
+      }
+    },
+    {
+      "id": "G03_specific_url_fetch",
+      "phase": "B",
+      "failure_type": "wrong_tool",
+      "query": "??c n?i dung t?i ??ng ??a ch? n?y gi?p t?i: https://www.rfc-editor.org/rfc/rfc9110",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "fetch",
+            "args": {
+              "url": "https://www.rfc-editor.org/rfc/rfc9110"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "C? URL c? th? v? y?u c?u ??c n?i dung th? ph?i g?i fetch v?i nguy?n URL, kh?ng t?m l?i b?ng lookup."
+      }
+    },
+    {
+      "id": "G04_missing_social_topic",
+      "phase": "B",
+      "failure_type": "missing_info",
+      "query": "T?m gi?p t?i 4 b?i ??ng m?i nh?t tr?n m?ng x? h?i v? ch? ?? ??.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "text"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "C?m 'ch? ?? ??' kh?ng c? antecedent n?n agent ph?i h?i l?i ch? ?? b?ng clarify, kh?ng t? ?o?n query."
+      }
+    },
+    {
+      "id": "G05_meta_tool_explanation",
+      "phase": "B",
+      "failure_type": "unnecessary_tool",
+      "query": "H?y gi?i th?ch ng?n g?n khi n?o b?n d?ng lookup v? khi n?o d?ng social_search; kh?ng c?n th?c hi?n t?m ki?m.",
+      "expect": {
+        "no_tool": true
+      },
+      "metadata": {
+        "what_it_tests": "C?u h?i meta v? ?? n?i r? kh?ng t?m ki?m ph?i ???c tr? l?i tr?c ti?p, kh?ng ph?t sinh tool call."
+      }
+    },
+    {
+      "id": "G06_carry_social_preferences",
+      "phase": "B",
+      "failure_type": "wrong_arg_value",
+      "turns": [
+        {
+          "role": "user",
+          "content": "T?m 6 b?i ??ng ph? bi?n nh?t tr?n Twitter v? m? h?nh ng?n ng? nh?."
+        },
+        {
+          "role": "user",
+          "content": "??i ch? ?? sang AI t?o sinh trong gi?o d?c."
+        },
+        {
+          "role": "user",
+          "content": "Gi? nguy?n s? l??ng v? c?ch s?p x?p ban ??u."
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "search_type": "Top",
+              "limit": 6
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Carry limit=6 v? search_type=Top t? turn ??u, ??ng th?i d?ng ch? ?? m?i t? turn hai; ch? ch?m hai preference ???c carry."
+      }
+    },
+    {
+      "id": "G07_correct_web_entity",
+      "phase": "B",
+      "failure_type": "wrong_arg_value",
+      "turns": [
+        {
+          "role": "user",
+          "content": "T?m tin t?c v? Nvidia trong th?ng n?y."
+        },
+        {
+          "role": "user",
+          "content": "T?i n?i nh?m, h?y ??i c?ng ty th?nh AMD."
+        },
+        {
+          "role": "user",
+          "content": "Gi? ph?m vi tin t?c v? th?i gian nh? ban ??u."
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "AMD",
+              "topic": "news",
+              "timeframe": "month"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "AMD ? turn hai ph?i ghi ?? Nvidia, c?n topic=news v? timeframe=month t? turn ??u ???c gi? l?i."
+      }
+    },
+    {
+      "id": "G08_correct_web_timeframe",
+      "phase": "B",
+      "failure_type": "wrong_arg_value",
+      "turns": [
+        {
+          "role": "user",
+          "content": "T?m tin t?c v? ?i?n to?n l??ng t? trong th?ng n?y."
+        },
+        {
+          "role": "user",
+          "content": "Thu h?p l?i th?nh tu?n n?y th?i."
+        },
+        {
+          "role": "user",
+          "content": "Ch? ?? v?n l? ?i?n to?n l??ng t?."
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "topic": "news",
+              "timeframe": "week"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Turn hai ph?i ??i timeframe t? month sang week; topic=news ???c carry, kh?ng ch?m exact query string."
+      }
+    },
+    {
+      "id": "G09_switch_web_to_social",
+      "phase": "B",
+      "failure_type": "wrong_tool",
+      "turns": [
+        {
+          "role": "user",
+          "content": "T?m tr?n web tin t?c m?i nh?t v? EU AI Act."
+        },
+        {
+          "role": "user",
+          "content": "B? ngu?n web, t?i mu?n xem th?o lu?n tr?n Twitter."
+        },
+        {
+          "role": "user",
+          "content": "Gi? nguy?n ch? ?? EU AI Act v? l?y c?c b?i m?i nh?t."
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "search_type": "Latest"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "B? ngu?n web n?n turn cu?i ph?i chuy?n t? lookup sang social_search, gi? ch? ?? v? ch?n b?i m?i nh?t."
+      }
+    },
+    {
+      "id": "G10_confirm_before_telegram",
+      "phase": "B",
+      "failure_type": "wrong_boundary",
+      "turns": [
+        {
+          "role": "user",
+          "content": "T?i c? m?t b?n tin v? AI c?n ??ng l?n Telegram."
+        },
+        {
+          "role": "user",
+          "content": "N?i dung l?: Ba c?p nh?t AI ??ng ch? ? trong tu?n."
+        },
+        {
+          "role": "user",
+          "content": "H?y ??ng n?i dung ?? l?n Telegram ngay."
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "yes_no"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Tr??c h?nh ??ng g?i ra ngo?i, agent ph?i xin x?c nh?n yes/no b?ng clarify v? kh?ng g?i send."
+      }
+    }
+  ]
 }
