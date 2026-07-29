@@ -9,7 +9,7 @@
 tools:
   # ---------------- Core tools ----------------
   - name: clarify
-    description: "Gửi một câu hỏi cho người dùng."
+    description: "Ask the user only when essential information is genuinely missing or when confirmation is required before a side effect. Do not use this tool when the request or conversation already contains the needed account handle or URL. Use response_type=text for missing information. Use response_type=yes_no whenever the user asks to send post publish or otherwise cause an external side effect; this confirmation boundary takes precedence over asking for more payload details in the current call."
     parameters:
       type: object
       properties:
@@ -19,45 +19,45 @@ tools:
       required: [question]
 
   - name: timeline
-    description: "Lấy các bài đăng gần đây."
+    description: "Get recent posts authored by one specific account. Use this for posts FROM a named person or handle; do not use it for posts ABOUT a topic. Convert well-known names to their canonical handles when unambiguous: Sam Altman -> sama, Elon Musk -> elonmusk, Andrej Karpathy -> karpathy. If no account can be recovered from the current request or conversation context, use clarify instead. Preserve an explicit requested count in limit."
     parameters:
       type: object
       properties:
-        screenname: {type: string, default: "", description: "Tên tài khoản"}
-        limit: {type: integer, default: 5, description: "Số lượng"}
+        screenname: {type: string, default: "", description: "Account handle without the leading @"}
+        limit: {type: integer, default: 5, description: "Exact requested post count; default 5 when unspecified"}
       required: [screenname]
 
   - name: social_search
-    description: "Tìm trên mạng xã hội."
+    description: "Search social posts from many accounts by topic or keyword. Use this for what people are saying ABOUT a subject; use timeline instead for posts FROM one account. Use search_type=Top for popular/top requests and Latest otherwise. Preserve an explicit requested count in limit."
     parameters:
       type: object
       properties:
-        query: {type: string, default: "", description: "Từ khóa"}
-        search_type: {type: string, enum: [Latest, Top], default: "Latest", description: "Cách sắp xếp"}
-        limit: {type: integer, default: 5, description: "Số lượng"}
+        query: {type: string, default: "", description: "The subject or keywords to search across social posts"}
+        search_type: {type: string, enum: [Latest, Top], default: "Latest", description: "Top for popular/top requests; Latest for recent or unspecified sorting"}
+        limit: {type: integer, default: 5, description: "Exact requested result count; default 5 when unspecified"}
       required: [query]
 
   - name: lookup
-    description: "Tra cứu thông tin trên internet."
+    description: "Search the public web for information or news. Use topic=news when the user asks for news and topic=general otherwise. Normalize today to timeframe=day and this week to timeframe=week. Keep query focused on the requested subject rather than adding filler words such as news. Do not use for social-only searches or when the user already supplied a URL to read."
     parameters:
       type: object
       properties:
-        query: {type: string, default: "", description: "Truy vấn"}
-        topic: {type: string, enum: [general, news], default: "general", description: "Phân loại"}
-        timeframe: {type: string, enum: [day, week, month, year], default: "week", description: "Khoảng thời gian"}
-        max_results: {type: integer, default: 5, description: "Số kết quả"}
+        query: {type: string, default: "", description: "Focused web-search subject or keywords"}
+        topic: {type: string, enum: [general, news], default: "general", description: "news for news/current-event requests; general otherwise"}
+        timeframe: {type: string, enum: [day, week, month, year], default: "week", description: "day=today; week=this week; month=this month; year=this year"}
+        max_results: {type: integer, default: 5, description: "Exact requested result count; default 5 when unspecified"}
       required: [query]
 
   - name: fetch
-    description: "Lấy nội dung từ một địa chỉ."
+    description: "Read and extract content from a specific URL already supplied by the user or conversation context. When a URL is present, copy that exact URL into the url argument and use this tool directly; do not ask for the URL again and do not replace it with a guessed URL. Do not use for broad web discovery."
     parameters:
       type: object
       properties:
-        url: {type: string, default: "", description: "Địa chỉ"}
+        url: {type: string, default: "", description: "The exact absolute URL supplied by the user or conversation context"}
       required: [url]
 
   - name: format
-    description: "Trình bày dữ liệu đã có thành văn bản."
+    description: "Format research items that are already available into a markdown digest. This tool does not search or fetch new information; call it only after source items have been obtained."
     parameters:
       type: object
       properties:
