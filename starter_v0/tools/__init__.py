@@ -8,9 +8,14 @@ import yaml
 # Folder names are intentionally vague to match the tool names students see.
 # The imported function names are the underlying implementations (unchanged).
 from .clarify.tool import ask_user
+from .citation_formatter.tool import format_citations
+from .deduplicate_sources.tool import deduplicate_sources
 from .papers.tool import arxiv_search
 from .paper_text.tool import get_arxiv_paper_text
+from .rss_reader.tool import read_rss_feed
+from .source_diversity_audit.tool import audit_source_diversity
 from .timeline.tool import get_user_tweets
+from .timeline_builder.tool import build_timeline
 from .fetch.tool import read_url
 from .format.tool import render_digest
 from .policy.tool import search_company_policy
@@ -35,6 +40,11 @@ TOOL_FUNCTIONS = {
     "policy": search_company_policy,
     "papers": arxiv_search,
     "paper_text": get_arxiv_paper_text,
+    "deduplicate_sources": deduplicate_sources,
+    "rss_reader": read_rss_feed,
+    "source_diversity_audit": audit_source_diversity,
+    "timeline_builder": build_timeline,
+    "citation_formatter": format_citations,
 }
 
 

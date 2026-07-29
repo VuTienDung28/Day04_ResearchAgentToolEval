@@ -116,3 +116,113 @@ tools:
         max_pages: {type: integer, default: 5, description: "Số trang"}
         max_chars: {type: integer, default: 8000, description: "Số ký tự"}
       required: [arxiv_url]
+
+  # ---------------- Team-authored research pipeline tools ----------------
+  - name: deduplicate_sources
+    description: "Remove duplicate entries from source items that are already available. Use only when the user asks to deduplicate or clean a supplied/collected source list. This tool does not search, fetch, summarize, rank, or verify sources."
+    parameters:
+      type: object
+      properties:
+        items:
+          type: array
+          description: "Already-available source objects to deduplicate."
+          items:
+            type: object
+            properties:
+              title: {type: string}
+              url: {type: string}
+              source: {type: string}
+              summary: {type: string}
+        match_by:
+          type: string
+          enum: [url, title, url_or_title]
+          default: url_or_title
+          description: "Duplicate matching rule."
+      required: [items]
+
+  - name: rss_reader
+    description: "Read recent entries from a specific public RSS or Atom feed URL. Use only when an RSS/Atom feed URL is known or explicitly requested. Do not use for a normal article URL, broad web discovery, or social search."
+    parameters:
+      type: object
+      properties:
+        feed_url:
+          type: string
+          description: "Exact absolute http/https RSS or Atom feed URL."
+        limit:
+          type: integer
+          default: 5
+          minimum: 1
+          maximum: 50
+          description: "Maximum feed entries to return."
+      required: [feed_url]
+
+  - name: source_diversity_audit
+    description: "Measure domain diversity and concentration for source items that are already available. Use only for a source-diversity/domain-concentration request. It does not search, fact-check, rank credibility, or judge whether a source is trustworthy."
+    parameters:
+      type: object
+      properties:
+        items:
+          type: array
+          description: "Already-available source objects containing URLs."
+          items:
+            type: object
+            properties:
+              title: {type: string}
+              url: {type: string}
+        concentration_threshold:
+          type: number
+          default: 0.5
+          minimum: 0
+          maximum: 1
+          description: "Dominant-domain share above which the list is marked concentrated."
+      required: [items]
+
+  - name: timeline_builder
+    description: "Sort already-available dated research items into a chronological timeline. This is not the timeline tool for social-account posts. Use only when the user asks to organize supplied or collected events by date; it does not search or fetch data."
+    parameters:
+      type: object
+      properties:
+        items:
+          type: array
+          description: "Already-available dated items using date, published_at, or updated_at."
+          items:
+            type: object
+            properties:
+              title: {type: string}
+              url: {type: string}
+              date: {type: string}
+              published_at: {type: string}
+              updated_at: {type: string}
+        order:
+          type: string
+          enum: [ascending, descending]
+          default: ascending
+          description: "Chronological sorting order."
+      required: [items]
+
+  - name: citation_formatter
+    description: "Format source metadata that is already available as a citation list. Use only when the user explicitly requests citations or a bibliography. It does not search, fetch, summarize, verify, or invent missing bibliographic facts."
+    parameters:
+      type: object
+      properties:
+        items:
+          type: array
+          description: "Already-available source metadata."
+          items:
+            type: object
+            properties:
+              title: {type: string}
+              url: {type: string}
+              author: {type: string}
+              authors:
+                type: array
+                items: {type: string}
+              source: {type: string}
+              year: {type: string}
+              published_at: {type: string}
+        style:
+          type: string
+          enum: [markdown, numbered, apa]
+          default: markdown
+          description: "Citation output style."
+      required: [items]
