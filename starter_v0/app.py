@@ -40,6 +40,11 @@ UI_TEXT = {
         "chat_placeholder": "Bạn muốn tìm hiểu chủ đề, tài khoản hoặc đường dẫn nào?",
         "spinner": "Đang tìm hướng xử lý và kiểm tra nguồn…",
         "transcript_saved": "Đã lưu transcript",
+        "download_transcript": "Tải transcript JSON",
+        "clear_chat": "Xóa cuộc trò chuyện",
+        "clear_confirmation": "Xóa cuộc trò chuyện hiện tại? File transcript đã lưu trên máy vẫn được giữ lại.",
+        "confirm": "Xóa",
+        "cancel": "Hủy",
         "trace": "Chi tiết xử lý",
         "turn": "lượt",
         "round": "Vòng",
@@ -76,6 +81,11 @@ UI_TEXT = {
         "chat_placeholder": "Ask about a topic, account, or URL…",
         "spinner": "Routing the request and checking sources…",
         "transcript_saved": "Transcript saved",
+        "download_transcript": "Download transcript JSON",
+        "clear_chat": "Clear conversation",
+        "clear_confirmation": "Clear the current conversation? The saved transcript file will remain on disk.",
+        "confirm": "Clear",
+        "cancel": "Cancel",
         "trace": "Processing details",
         "turn": "turn",
         "round": "Round",
@@ -645,6 +655,7 @@ def initialize_state() -> None:
         "config_key": None,
         "ui_language": "vi",
         "light_mode": False,
+        "confirm_clear": False,
     }
     for key, value in defaults.items():
         if key not in st.session_state:
@@ -709,6 +720,35 @@ def main() -> None:
             f'<div class="footer-note">{text(language, "configuration_note")}</div>',
             unsafe_allow_html=True,
         )
+        transcript = st.session_state.transcript
+        st.download_button(
+            text(language, "download_transcript"),
+            json.dumps(transcript, ensure_ascii=False, indent=2) if transcript else "",
+            file_name=(st.session_state.transcript_path.name if transcript else "transcript.json"),
+            mime="application/json",
+            use_container_width=True,
+            disabled=not transcript,
+        )
+        if st.button(
+            text(language, "clear_chat"),
+            use_container_width=True,
+            key="clear_chat",
+            disabled=not transcript,
+        ):
+            st.session_state.confirm_clear = True
+        if st.session_state.confirm_clear:
+            st.warning(text(language, "clear_confirmation"))
+            confirm, cancel = st.columns(2)
+            if confirm.button(text(language, "confirm"), use_container_width=True):
+                st.session_state.agent_history = []
+                st.session_state.transcript = None
+                st.session_state.transcript_path = None
+                st.session_state.config_key = None
+                st.session_state.confirm_clear = False
+                st.rerun()
+            if cancel.button(text(language, "cancel"), use_container_width=True):
+                st.session_state.confirm_clear = False
+                st.rerun()
 
     st.markdown(hero_html(language), unsafe_allow_html=True)
 
